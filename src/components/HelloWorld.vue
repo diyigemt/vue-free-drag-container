@@ -48,7 +48,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import draggable from "vuedraggable";
 let id = 1;
 export default {
@@ -70,7 +70,7 @@ export default {
     };
   },
   computed: {
-    draggingInfo() {
+    draggingInfo(): string {
       return this.dragging ? "under drag" : "";
     }
   },
