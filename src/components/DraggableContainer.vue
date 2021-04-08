@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, reactive, onMounted, ref} from "vue";
+import {defineComponent, reactive, onMounted, ref, toRefs} from "vue";
 import emitter from "../utils/mitt";
 
 export default defineComponent({
@@ -25,7 +25,9 @@ export default defineComponent({
     const circle = ref();
     const refData = reactive({
       posX: 0,
-      posY: 0
+      posY: 0,
+      maxX: -1,
+      maxY: -1
     })
     const mousemove = (e: MouseEvent): void => {
       if (!e) (e as any) = window.event; //IE
@@ -33,29 +35,31 @@ export default defineComponent({
       let top = (e.clientY - refData.posY);
       if (left < 0) left = 0;
       if (top < 0) top = 0;
-      const maxLeft = container.value.offsetWidth - circle.value.offsetWidth;
-      const maxTop = container.value.offsetHeight - circle.value.offsetHeight;
-      if (left > maxLeft) left = maxLeft;
-      if (top > maxTop) top = maxTop;
       circle.value.style.left = left + "px";
       circle.value.style.top = top + "px";
-      if (props.emitType === "sender") {
-        emitter.emit("emit-".concat(props.emitIndex.toString()));
-      }
     }
     onMounted(() => {
+      refData.maxX = container.value.offsetLeft - circle.value.offsetWidth;
+      refData.maxY = container.value.offsetTop - circle.value.offsetHeight;
       (circle.value as HTMLHtmlElement).addEventListener("mousedown", (e: MouseEvent) => {
         refData.posX = e.x - circle.value.offsetLeft;
         refData.posY = e.y - circle.value.offsetTop;
         document.onmousemove = mousemove;
       });
       document.onmouseup = () => {
+        console.log(circle.value.offsetLeft);
+        if (circle.value.offsetLeft > refData.maxX || circle.value.offsetTop > refData.maxY) {
+          if (props.emitType === "sender") {
+            emitter.emit("emit-".concat(props.emitIndex.toString()), circle.value);
+          }
+        }
         document.onmousemove = null;
       };
     });
     return {
       container,
-      circle
+      circle,
+      ...toRefs(refData)
     }
   },
   directives: {
@@ -63,8 +67,8 @@ export default defineComponent({
       mounted(el, binding) {
         const { emitType, emitIndex } = binding.value;
         if (emitType === "receiver") {
-          emitter.on("emit".concat("-", emitIndex), () => {
-            console.log(emitIndex);
+          emitter.on("emit".concat("-", emitIndex), <HTMLElement>(el: HTMLElement) => {
+            console.log(Reflect.get(el as Object, "offsetTop"));
           });
         }
       }
