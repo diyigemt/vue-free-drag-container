@@ -2,7 +2,7 @@
   <!-- <HelloWorld msg="Hello Vue 3 + TypeScript + Vite" /> -->
   <div class="container">
     <DraggableContainer/>
-    <DraggableContainer/>
+    <DraggableContainer emit-type="receiver"/>
   </div>
 </template>
 

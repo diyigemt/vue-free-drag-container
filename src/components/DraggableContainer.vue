@@ -1,14 +1,25 @@
 <template>
-  <div v-alert ref="container" class="container">
+  <div v-alert="{emitType, emitIndex}" ref="container" class="container">
     <div ref="circle" class="circle"></div>
   </div>
 </template>
 
 <script lang="ts">
 import {defineComponent, reactive, onMounted, ref} from "vue";
+import emitter from "../utils/mitt";
 
 export default defineComponent({
   name: "DraggableContainer",
+  props: {
+    emitType: {
+      type: String,
+      default: "sender"
+    },
+    emitIndex: {
+      type: Number,
+      default: 0
+    }
+  },
   setup(props, ctx) {
     const container = ref();
     const circle = ref();
@@ -22,12 +33,15 @@ export default defineComponent({
       let top = (e.clientY - refData.posY);
       if (left < 0) left = 0;
       if (top < 0) top = 0;
-      const maxLeft = container.value.offsetWidth - circle.value.offsetWidth
-      const maxTop = container.value.offsetHeight - circle.value.offsetHeight
+      const maxLeft = container.value.offsetWidth - circle.value.offsetWidth;
+      const maxTop = container.value.offsetHeight - circle.value.offsetHeight;
       if (left > maxLeft) left = maxLeft;
       if (top > maxTop) top = maxTop;
-      circle.value.style.left = left + "px"
-      circle.value.style.top = top + "px"
+      circle.value.style.left = left + "px";
+      circle.value.style.top = top + "px";
+      if (props.emitType === "sender") {
+        emitter.emit("emit-".concat(props.emitIndex.toString()));
+      }
     }
     onMounted(() => {
       (circle.value as HTMLHtmlElement).addEventListener("mousedown", (e: MouseEvent) => {
@@ -46,8 +60,13 @@ export default defineComponent({
   },
   directives: {
     alert: {
-      mounted(el) {
-        console.log(el);
+      mounted(el, binding) {
+        const { emitType, emitIndex } = binding.value;
+        if (emitType === "receiver") {
+          emitter.on("emit".concat("-", emitIndex), () => {
+            console.log(emitIndex);
+          });
+        }
       }
     }
   }
