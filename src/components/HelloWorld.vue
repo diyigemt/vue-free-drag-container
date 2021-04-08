@@ -1,65 +1,111 @@
 <template>
-  <h1>{{ msg }}</h1>
+  <div class="row">
+    <div class="col-2">
+      <div class="form-group">
+        <div
+            class="btn-group-vertical buttons"
+            role="group"
+            aria-label="Basic example"
+        >
+          <button class="btn btn-secondary" @click="add">Add</button>
+          <button class="btn btn-secondary" @click="replace">Replace</button>
+        </div>
 
-  <p>
-    Recommended IDE setup:
-    <a href="https://code.visualstudio.com/" target="_blank">VSCode</a>
-    +
-    <a
-      href="https://marketplace.visualstudio.com/items?itemName=octref.vetur"
-      target="_blank"
-    >Vetur</a>
-    or
-    <a href="https://github.com/johnsoncodehk/volar" target="_blank">Volar</a>
-    (if using
-    <code>&lt;script setup&gt;</code>)
-  </p>
+        <div class="form-check">
+          <input
+              id="disabled"
+              type="checkbox"
+              v-model="enabled"
+              class="form-check-input"
+          />
+          <label class="form-check-label" for="disabled">DnD enabled</label>
+        </div>
+      </div>
+    </div>
 
-  <p>See <code>README.md</code> for more information.</p>
+    <div class="col-6">
+      <h3>Draggable {{ draggingInfo }}</h3>
 
-  <p>
-    <a href="https://vitejs.dev/guide/features.html" target="_blank">Vite Docs</a> |
-    <a href="https://v3.vuejs.org/" target="_blank">Vue 3 Docs</a>
-  </p>
+      <draggable
+          :list="list"
+          :disabled="!enabled"
+          item-key="name"
+          class="list-group"
+          ghost-class="ghost"
+          :move="checkMove"
+          @start="dragging = true"
+          @end="dragging = false"
+      >
+        <template #item="{ element }">
+          <div class="list-group-item" :class="{ 'not-draggable': !enabled }">
+            {{ element.name }}
+          </div>
+        </template>
+      </draggable>
+    </div>
 
-  <button @click="count++">count is: {{ count }}</button>
-  <p>
-    Edit
-    <code>components/HelloWorld.vue</code> to test hot module replacement.
-  </p>
+    <rawDisplayer class="col-3" :value="list" title="List" />
+  </div>
 </template>
 
-<script lang="ts">
-import { ref, defineComponent } from 'vue'
-export default defineComponent({
-  name: 'HelloWorld',
-  props: {
-    msg: {
-      type: String,
-      required: true
+<script>
+import draggable from "vuedraggable";
+let id = 1;
+export default {
+  name: "HelloWord",
+  display: "Simple",
+  order: 0,
+  components: {
+    draggable
+  },
+  data() {
+    return {
+      enabled: true,
+      list: [
+        { name: "John", id: 0 },
+        { name: "Joao", id: 1 },
+        { name: "Jean", id: 2 }
+      ],
+      dragging: false
+    };
+  },
+  computed: {
+    draggingInfo() {
+      return this.dragging ? "under drag" : "";
     }
   },
-  setup: () => {
-    const count = ref(0)
-    return { count }
+  methods: {
+    add: function() {
+      this.list.push({ name: "Juan " + id, id: id++ });
+    },
+    replace: function() {
+      this.list = [{ name: "Edgard", id: id++ }];
+    },
+    checkMove: function(e) {
+      window.console.log("Future index: " + e.draggedContext.futureIndex);
+    }
   }
-})
+};
 </script>
-
 <style scoped>
-a {
-  color: #42b983;
+.buttons {
+  margin-top: 35px;
 }
-
-label {
-  margin: 0 0.5em;
-  font-weight: bold;
+.ghost {
+  opacity: 0.5;
+  background: #c8ebfb;
 }
-
-code {
-  background-color: #eee;
-  padding: 2px 4px;
-  border-radius: 4px;
-  color: #304455;
+.not-draggable {
+  cursor: no-drop;
+}
+.list-group-item {
+  justify-content: center;
+  text-align: center;
+  vertical-align: center;
+  background-color: #00000030;
+  width: 300px;
+  height: 80px;
+  border-radius: 5px;
+  margin-top: 10px;
 }
 </style>

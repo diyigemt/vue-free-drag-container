@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .mydiv {
+      position: absolute;
+      z-index: 1000;
+      width: 50px;
+      height: 50px;
+      background-color: blue;
+      border-radius: 50px;
+      filter: Alpha(opacity=50);
+      opacity: 0.5;
+    }
+
+    #container {
+      position: relative;
+      width: 500px;
+      height: 500px;
+      background-color: #00000030;
+    }
+  </style>
+  <script>
+    let posX;
+    let posY;
+    let fwuss;
+    window.onload = function () {
+      fwuss = document.getElementById("wuss");
+      fwuss.onmousedown = function (e) {
+        posX = event.x - fwuss.offsetLeft; //获得横坐标x
+        posY = event.y - fwuss.offsetTop; //获得纵坐标y
+        document.onmousemove = mousemove; //调用函数，只要一直按着按钮就能一直调用
+      }
+      document.onmouseup = function () {
+        document.onmousemove = null; //鼠标举起，停止
+      }
+    }
+    function mousemove(ev) {
+      if (ev == null) ev = window.event; //IE
+      let left = (ev.clientX - posX);
+      let top = (ev.clientY - posY);
+      if (left < 0) left = 0
+      if (top < 0) top = 0
+      const container = document.getElementById("container")
+      const maxLeft = container.offsetWidth - fwuss.offsetWidth
+      const maxTop = container.offsetHeight - fwuss.offsetHeight
+      if (left > maxLeft) left = maxLeft
+      if (top > maxTop) top = maxTop
+      fwuss.style.left = left + "px"
+      fwuss.style.top = top + "px"
+
+    }
+  </script>
+</head>
+
+<body>
+  <div id="container">
+    <div id="wuss" class="mydiv" style="left:0px;top: 20px;"></div>
+  </div>
+</body>
+
+</html>
