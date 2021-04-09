@@ -1,12 +1,24 @@
 <template>
-  <div v-alert="{emitType, emitIndex}" ref="container" class="container">
-    <div ref="circle" class="circle"></div>
+  <div v-alert="{emitType, emitIndex}" class="container" :id="'container' + keys" @ondrag="allowDrop">
+    <div :id="'obj' + keys" draggable="true">
+      <slot></slot>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import {defineComponent, reactive, onMounted, ref, toRefs} from "vue";
+import {defineComponent, reactive, onMounted, toRefs} from "vue";
 import emitter from "../utils/mitt";
+
+interface RefData {
+  posX: number;
+  posY: number;
+  maxX: number;
+  maxY: number;
+  keys: string;
+  container: null | HTMLElement;
+  obj: null | HTMLElement;
+}
 
 export default defineComponent({
   name: "DraggableContainer",
@@ -21,13 +33,14 @@ export default defineComponent({
     }
   },
   setup(props, ctx) {
-    const container = ref();
-    const circle = ref();
-    const refData = reactive({
+    const refData = reactive<RefData>({
       posX: 0,
       posY: 0,
       maxX: -1,
-      maxY: -1
+      maxY: -1,
+      keys: Math.random().toFixed(8).toString(),
+      container: null,
+      obj: null
     })
     const mousemove = (e: MouseEvent): void => {
       if (!e) (e as any) = window.event; //IE
@@ -35,31 +48,38 @@ export default defineComponent({
       let top = (e.clientY - refData.posY);
       if (left < 0) left = 0;
       if (top < 0) top = 0;
-      circle.value.style.left = left + "px";
-      circle.value.style.top = top + "px";
+      refData.obj!.style.left = left + "px";
+      refData.obj!.style.top = top + "px";
+    }
+    const handleDragend = (): void => {
+      if (refData.obj!.offsetLeft > refData.maxX || refData.obj!.offsetTop > refData.maxY) {
+        if (props.emitType === "sender") {
+          emitter.emit("emit-".concat(props.emitIndex.toString()), refData.obj);
+        }
+      }
+    }
+    const allowDrop = (e: DragEvent): void => {
+      e.preventDefault();
     }
     onMounted(() => {
-      refData.maxX = container.value.offsetLeft - circle.value.offsetWidth;
-      refData.maxY = container.value.offsetTop - circle.value.offsetHeight;
-      (circle.value as HTMLHtmlElement).addEventListener("mousedown", (e: MouseEvent) => {
-        refData.posX = e.x - circle.value.offsetLeft;
-        refData.posY = e.y - circle.value.offsetTop;
+      const circle = refData.obj = document.getElementById("obj".concat(refData.keys)) as HTMLElement;
+      const container = refData.container = document.getElementById("container".concat(refData.keys)) as HTMLElement;
+      refData.maxX = container.offsetLeft - circle.offsetWidth;
+      refData.maxY = container.offsetTop - circle.offsetHeight;
+      (circle as HTMLHtmlElement).addEventListener("mousedown", (e: MouseEvent) => {
+        refData.posX = e.x - circle.offsetLeft;
+        refData.posY = e.y - circle.offsetTop;
         document.onmousemove = mousemove;
       });
       document.onmouseup = () => {
-        console.log(circle.value.offsetLeft);
-        if (circle.value.offsetLeft > refData.maxX || circle.value.offsetTop > refData.maxY) {
-          if (props.emitType === "sender") {
-            emitter.emit("emit-".concat(props.emitIndex.toString()), circle.value);
-          }
-        }
         document.onmousemove = null;
       };
     });
     return {
-      container,
-      circle,
-      ...toRefs(refData)
+      ...toRefs(refData),
+      handleDragend,
+      mousemove,
+      allowDrop
     }
   },
   directives: {
@@ -78,20 +98,6 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
-.circle {
-  position: absolute;
-  z-index: 1000;
-  width: 50px;
-  height: 50px;
-  background-color: blue;
-  border-radius: 50px;
-  filter: Alpha(opacity=50);
-  opacity: 0.5;
-}
-
-.circle:hover {
-  cursor: move;
-}
 
 .container {
   position: relative;

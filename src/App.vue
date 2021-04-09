@@ -1,8 +1,8 @@
 <template>
   <!-- <HelloWorld msg="Hello Vue 3 + TypeScript + Vite" /> -->
   <div class="container">
-    <DraggableContainer/>
-    <DraggableContainer emit-type="receiver"/>
+    <DraggableContainer><div class="circle"></div></DraggableContainer>
+    <DraggableContainer emit-type="receiver"><div class="circle"></div></DraggableContainer>
   </div>
 </template>
 
@@ -32,5 +32,18 @@ export default defineComponent({
 .container {
   float: left;
   margin: 2px;
+}
+.circle {
+  position: absolute;
+  z-index: 1000;
+  width: 50px;
+  height: 50px;
+  background-color: blue;
+  border-radius: 50px;
+  filter: Alpha(opacity=50);
+  opacity: 0.5;
+  &:hover {
+    cursor: move;
+  }
 }
 </style>
