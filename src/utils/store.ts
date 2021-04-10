@@ -1,5 +1,6 @@
 const DRAG_ITEM = "drag-item"
 const DRAG_POS = "drag-pos"
+const DRAG_INDEX = "drag-index"
 interface DragPos {
   posX: number;
   posY: number;
@@ -20,6 +21,12 @@ class Store extends Map {
   clearDragItem() {
     this.set(DRAG_ITEM, null);
     this.set(DRAG_POS, null);
+  }
+  setDragIndex(index: number) {
+    this.set(DRAG_INDEX, index);
+  }
+  getDragIndex(): number {
+    return this.get(DRAG_INDEX)
   }
 }
 const store = new Store()

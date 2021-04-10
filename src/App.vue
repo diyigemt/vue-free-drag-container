@@ -1,8 +1,10 @@
 <template>
   <!-- <HelloWorld msg="Hello Vue 3 + TypeScript + Vite" /> -->
   <div class="container">
-    <DraggableContainer><div class="circle"></div></DraggableContainer>
-    <DraggableContainer emit-receive>
+    <DraggableContainer>
+      <div class="circle"></div>
+    </DraggableContainer>
+    <DraggableContainer drag-sender sender-move>
       <div class="circle"></div>
       <div class="circle"></div>
     </DraggableContainer>
