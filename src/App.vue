@@ -2,7 +2,10 @@
   <!-- <HelloWorld msg="Hello Vue 3 + TypeScript + Vite" /> -->
   <div class="container">
     <DraggableContainer><div class="circle"></div></DraggableContainer>
-    <DraggableContainer emit-type="receiver"><div class="circle"></div></DraggableContainer>
+    <DraggableContainer emit-receive>
+      <div class="circle"></div>
+      <div class="circle"></div>
+    </DraggableContainer>
   </div>
 </template>
 
@@ -34,7 +37,6 @@ export default defineComponent({
   margin: 2px;
 }
 .circle {
-  position: absolute;
   z-index: 1000;
   width: 50px;
   height: 50px;
@@ -42,8 +44,5 @@ export default defineComponent({
   border-radius: 50px;
   filter: Alpha(opacity=50);
   opacity: 0.5;
-  &:hover {
-    cursor: move;
-  }
 }
 </style>
