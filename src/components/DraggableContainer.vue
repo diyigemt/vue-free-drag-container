@@ -10,11 +10,6 @@
 <script lang="ts">
 import {defineComponent, reactive, toRefs} from "vue";
 import store from "../core/store";
-interface RefData {
-  posX: number;
-  posY: number;
-}
-
 export default defineComponent({
   name: "DraggableContainer",
   props: {
@@ -31,11 +26,7 @@ export default defineComponent({
       default: 0
     }
   },
-  setup(props, ctx) {
-    const refData = reactive<RefData>({
-      posX: 0,
-      posY: 0
-    });
+  setup(props) {
     const findParent = (el: HTMLElement | null, className: string): HTMLElement | null => {
       if (!el) return null;
       let res = el;
@@ -53,7 +44,10 @@ export default defineComponent({
       if (!props.dragSender) {
         e.preventDefault();
       }
-      if (props.dragSender && props.senderMove) {
+      const {item} = store.getDragData();
+      const parent = findParent(e.target as HTMLElement, "container");
+      const itemParent = findParent(item, "container");
+      if (props.dragSender && props.senderMove && parent === itemParent) {
         e.preventDefault();
       }
     };
@@ -85,7 +79,6 @@ export default defineComponent({
       store.setDragIndex(props.dragIndex);
     }
     return {
-      ...toRefs(refData),
       allowDrop,
       onMouseDown,
       onDragEnd,
