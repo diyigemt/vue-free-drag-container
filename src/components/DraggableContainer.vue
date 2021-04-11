@@ -9,7 +9,7 @@
 
 <script lang="ts">
 import {defineComponent, reactive, toRefs} from "vue";
-import store from "../utils/store";
+import store from "../core/store";
 interface RefData {
   posX: number;
   posY: number;
@@ -49,7 +49,8 @@ export default defineComponent({
     }
     const allowDrop = (e: DragEvent): void => {
       const index = store.getDragIndex();
-      if (index === props.dragIndex && !props.dragSender) {
+      if (index !== props.dragIndex) return;
+      if (!props.dragSender) {
         e.preventDefault();
       }
       if (props.dragSender && props.senderMove) {

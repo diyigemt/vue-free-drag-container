@@ -4,7 +4,7 @@
     <DraggableContainer>
       <div class="circle"></div>
     </DraggableContainer>
-    <DraggableContainer drag-sender sender-move>
+    <DraggableContainer drag-sender sender-move drag-index="1">
       <div class="circle"></div>
       <div class="circle"></div>
     </DraggableContainer>
