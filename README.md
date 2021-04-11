@@ -3,7 +3,7 @@ a vue3 component that allows you to drag and drop anything freely
 
 # How to use
 1.import DraggableContainer and register it as a vue component</br>
-2.put anything you want between <DraggableContainer></DraggableContainer></br>
+2.put anything you want between &lt;DraggableContainer>(template)&lt;/DraggableContainer></br>
 3.drag them within DraggableContainer or between two or more DraggableContainers
 
 # Props
